@@ -12,11 +12,10 @@ A Stream is the smallest unit of Streamy.
 
 Streams have the following properties:
 
-* Code: script containing logic on how to process stream
-  More specifically, an executable file that processes JSON Objects on standard input/output
+* Code: script containing logic on how to process stream -- more specifically, an executable processing JSON Objects on standard input/output
 * Sources: 0 or more source streams
 * Sinks: 0 or more listening streams
-* Cores: 0 or more running Unix processes executing script
+* Cores: 0 or more running processes executing script
 
 == Classes of Streams
 
