@@ -1,0 +1,132 @@
+= Streamy
+
+* http://github.com/mikewadhera/streamy
+
+Streamy is a lightweight framework for stream-oriented programming built on top of node JS.
+
+**DISCLAIMER: As of 11/2011 this project is under constant development. This means the code is of beta quality at best.**
+
+== Stream
+
+A Stream is the smallest unit of Streamy.
+
+Streams have the following properties:
+
+* Code: script containing logic on how to process stream
+  More specifically, an executable file that processes JSON Objects on standard input/output
+* Sources: 0 or more source streams
+* Sinks: 0 or more listening streams
+* Cores: 0 or more running Unix processes executing script
+
+== Classes of Streams
+
+There are 2 classes of streams:
+
+* Simple: streams which only produce new messages
+* Compound: streams whose messages are derived from at least 1 other stream
+
+Notes:
+
+- A Simple stream is always the root of a Compound stream.
+- Streamy's runtime doesn't treat these classes separately. Their sole purpose is to serve as abstractions for developers. 
+
+== Messages
+
+Messages are JSON Objects [http://en.wikipedia.org/wiki/Associative_array]
+
+== Lazy Evaluation
+
+Every Streamy stream is lazily evaluated, meaning a stream only processes itself when someone is listening.
+
+When no listeners (sinks) are present the stream's sources are closed and it's cores are shut down. This means streams only spend the system resources (memory, network connections) required for evaluation.
+
+== Dynamic Composition
+
+Any Compound stream can be derived from any number of Simple or Compound streams.
+
+This allows you to create complex compound streams whos values are the result of several layers of stream processing.
+
+== Simple Streams
+
+Each stream is effectively an HTTP web service.
+
+- To start a stream you ask streamyd to start a stream on a given port.
+- To listen to a stream you simply send it an HTTP request.
+
+For instance, lets say we have a Simple stream that generates random sentences, aptly titled 'sentences':
+
+  ~ % streamyd sentences --port 9000
+  Stream sentences started (parallelism: 1). Listening on: 9000
+
+This will start our sentences stream on port 9000.
+
+Now, let's listen to the sentences stream. You can use any HTTP client, such as curl:
+
+  ~ % curl -s http://localhost:9000/sentences
+  {"sentence":"The quick brown fox jumped over the lazy dog"}
+  {"sentence":"Four score and seven years ago"}
+  {"sentence":"I like turtles"}
+  ...
+
+This will open an HTTP long-polling connection to the streamyd server asking to listen for sentences. Messages will continue to stream for as long as the connection is left open.
+
+Note: if you kill the curl command the stream will pause & resume whenever another connection is made. This is why Streamy is refered to as "lazy"
+
+== Compound Streams
+
+Performing complex stream processing is easy, you simply create a Compound stream & then listen to it.
+
+To continue from the example above, lets say we want to count the number of words in our sentences stream:
+
+First, we start our sentences stream:
+
+  ~ % streamyd sentences --port 9000
+  Stream sentences started (parallelism: 1). Listening on: 9000
+
+Next we start our sentence-to-words stream. This is a Compound stream which takes the sentence stream as a source & emits words:
+
+  ~ % streamyd sentence-to-words --port 9001 --source http://localhost:9000/sentences
+  Stream sentence-to-words started (parallelism: 1). Listening on: 9001
+    Source: http://localhost:9000/sentences
+
+Great. If all goes well, you shouldn't notice anything. Thats because our Compound stream sentence-to-words has yet to be evaluated.
+
+So, lets evaluate the sentence-to-words stream. Using curl again:
+
+  ~ % curl -s http://localhost:9001/sentence-to-words
+  {"word":"The"}
+  {"word":"quick"}
+  {"word":"brown"}
+  {"word":"fox"}
+  {"word":"jumped"}
+  {"word":"over"}
+  {"word":"the"}
+  {"word":"lazy"}
+  {"word":"dog"}
+  ...
+
+Success!
+
+== Writing Scripts
+
+TODO
+
+== Testing Scripts
+
+TODO
+
+== Load Balancing
+
+TODO
+
+== Message Grouping
+
+TODO
+
+== Deployment
+
+TODO
+
+== Limitations
+
+TODO
