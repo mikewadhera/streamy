@@ -17,9 +17,7 @@ var corePath;
 // Helpers
 
 var indexOfById = function (array, id) {
-  for (var i = 0; i < array.length; i++) {
-    if (array[i].id == id) return i;
-  }
+  for (var i = 0; i < array.length; i++) if (array[i].id == id) return i;
 }
 
 var removeById = function (array, id) {
@@ -55,9 +53,8 @@ var server = function () {
   }
 
   var stopSources = function () {
-    for (source in sources) sources[source].abort();
+    for (var source in sources) sources[source].abort();
     sources = [];
-
   }
 
   // Cores
@@ -81,9 +78,7 @@ var server = function () {
   }
 
   var startCores = function () {
-    for (var i = cores.length; i < concurrency; i++) {
-      startCore();
-    }
+    for (var i = cores.length; i < concurrency; i++) startCore();
   }
 
   var startCore = function () {
@@ -213,7 +208,7 @@ if (argv.source) {
   } else {
     sources = new Array(argv.source);
   }
-  for (i in sources) sourceOptions.push(url.parse(sources[i]));
+  for (var i in sources) sourceOptions.push(url.parse(sources[i]));
 }
 
 var streamName = argv._[0];
@@ -227,7 +222,7 @@ if (streamName) {
 
       http.createServer(server()).listen(port);
       console.log("Stream " + streamName + " started (" + "parallelism: " + parallelism + "). Listening on: " + port);
-      for (i in sources) console.log("  Source: " + sources[i]);
+      for (var i in sources) console.log("  Source: " + sources[i]);
     } else {
       console.log("Error: Unable to load " + scriptPath + " - are you sure its executable?");
     }
