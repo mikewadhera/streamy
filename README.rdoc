@@ -31,7 +31,7 @@ Notes:
 
 == Messages
 
-Messages are JSON Objects [http://en.wikipedia.org/wiki/Associative_array]
+Messages are JSON Objects http://en.wikipedia.org/wiki/Associative_array
 
 == Lazy Evaluation
 
