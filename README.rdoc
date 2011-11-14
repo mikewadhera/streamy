@@ -2,7 +2,7 @@
 
 * http://github.com/mikewadhera/streamy
 
-Streamy is a lightweight framework for stream-oriented programming built on top of node JS.
+Streamy is a lightweight framework for distributed stream-oriented programming built on top of node JS.
 
 **DISCLAIMER: As of 11/2011 this project is under constant development. This means the code is of beta quality at best.**
 
