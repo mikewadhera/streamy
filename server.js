@@ -11,8 +11,9 @@ var http           = require('http')
 var debug         = false;
 var parallelism   = 1;
 var sourceOptions = [];
-var coreName;
-var corePath;
+
+var streamName;
+var scriptPath;
 
 // Helpers
 
@@ -78,11 +79,11 @@ var server = function () {
   }
 
   var startCores = function () {
-    for (var i = cores.length; i < concurrency; i++) startCore();
+    for (var i = cores.length; i < parallelism; i++) startCore();
   }
 
   var startCore = function () {
-    var core = child_process.spawn(corePath);
+    var core = child_process.spawn(scriptPath);
     core.stdout.setEncoding('utf8');
     core.stderr.setEncoding('utf8');
     core.stdout.on('data', notifySinks);
@@ -147,7 +148,7 @@ var server = function () {
   var serve = function (request, response) {
     var path = url.parse(request.url).pathname;
 
-    if (path != ("/" + coreName)) {
+    if (path != ("/" + streamName)) {
       response.writeHead(404, { 'Content-Type' : 'text/plain' });
       response.write("404 Not Found\n");
       response.end();
@@ -175,7 +176,7 @@ var server = function () {
     if (debug) console.log("Sinks  : " + sinks.length);
 
     if (sinksRegistered()) {
-      if (cores.length < concurrency) {
+      if (cores.length < parallelism) {
         if (debug) console.log("Starting Cores");
         startCores();
       }
@@ -211,15 +212,12 @@ if (argv.source) {
   for (var i in sources) sourceOptions.push(url.parse(sources[i]));
 }
 
-var streamName = argv._[0];
+streamName = argv._[0];
 
 if (streamName) {
-  var scriptPath = "./scripts/" + streamName;
+  scriptPath = "./scripts/" + streamName;
   fs.stat(scriptPath, function (err, stats) {
     if (stats && stats.mode > 33200) {
-      coreName = streamName;
-      corePath = scriptPath;
-
       http.createServer(server()).listen(port);
       console.log("Stream " + streamName + " started (" + "parallelism: " + parallelism + "). Listening on: " + port);
       for (var i in sources) console.log("  Source: " + sources[i]);
