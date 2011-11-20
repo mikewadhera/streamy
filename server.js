@@ -98,7 +98,7 @@ var server = function () {
 
   var stopCores = function () {
     for (var i = 0; i < cores.length; i++) {
-      cores[i].control.kill();
+      cores[i].control.kill("SIGINT");
     }
     cores = [];
     coresWriteOffset = 0;
